@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>TlaxReport V1.0</title>
+
+<style>
+
+body{
+    background-color:#C8A2C8;
+    font-family:Arial;
+    text-align:center;
+}
+
+input, button{
+    margin:5px;
+    padding:5px;
+}
+
+textarea{
+    width:80%;
+    height:250px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>TLAXREPORT</h1>
+
+<h3>Sistema de Denuncias Ciudadanas</h3>
+
+<p>
+1 - Baches<br>
+2 - Falta de Alumbrado<br>
+3 - Mantenimiento de Alumbrado<br>
+4 - Fuga de agua<br>
+5 - Faltan Semáforos<br>
+6 - Mantenimiento de Semáforos<br>
+7 - Fuga de gas
+</p>
+
+<input type="text" id="tipo" placeholder="Tipo de denuncia"><br>
+
+<input type="text" id="nombre" placeholder="Nombre"><br>
+
+<input type="text" id="direccion" placeholder="Dirección"><br>
+
+<input type="text" id="descripcion" placeholder="Descripción"><br>
+
+<button onclick="guardarDenuncia()">
+Guardar Denuncia
+</button>
+
+<button onclick="mostrarDenuncias()">
+Mostrar Denuncias
+</button>
+
+<br><br>
+
+<textarea id="resultado"></textarea>
+
+<script>
+
+let nombres = [];
+let direcciones = [];
+let descripciones = [];
+let tipos = [];
+
+function guardarDenuncia(){
+
+    nombres.push(
+        document.getElementById("nombre").value
+    );
+
+    direcciones.push(
+        document.getElementById("direccion").value
+    );
+
+    descripciones.push(
+        document.getElementById("descripcion").value
+    );
+
+    tipos.push(
+        document.getElementById("tipo").value
+    );
+
+    alert("Denuncia guardada correctamente");
+
+    document.getElementById("nombre").value="";
+    document.getElementById("direccion").value="";
+    document.getElementById("descripcion").value="";
+    document.getElementById("tipo").value="";
+}
+
+function mostrarDenuncias(){
+
+    let texto="";
+
+    for(let i=0; i<nombres.length; i++){
+
+        texto += "Denuncia " + (i+1) + "\n";
+
+        texto += "Nombre: " +
+        nombres[i] + "\n";
+
+        texto += "Dirección: " +
+        direcciones[i] + "\n";
+
+        texto += "Descripción: " +
+        descripciones[i] + "\n";
+
+        texto += "Tipo: " +
+        tipos[i] + "\n\n";
+    }
+
+    document.getElementById("resultado").value =
+    texto;
+}
+
+</script>
+
+</body>
+
+</html>
