@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<title>TlaxReport V2.0</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background-color: #E6D5F7;
+    margin: 0;
+    padding: 0;
+}
+
+.contenedor{
+    width: 80%;
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+h1{
+    text-align: center;
+    color: purple;
+}
+
+h3{
+    text-align: center;
+}
+
+input{
+    width: 95%;
+    padding: 8px;
+    margin: 5px;
+}
+
+button{
+    background-color: #C8A2C8;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+button:hover{
+    background-color: #B48FB4;
+}
+
+textarea{
+    width: 98%;
+    height: 250px;
+    margin-top: 10px;
+}
+
+.caja{
+    border: 1px solid lightgray;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="contenedor">
+
+<h1>TLAXREPORT</h1>
+
+<h3>Sistema de Denuncias Ciudadanas</h3>
+
+<div class="caja">
+
+<h4>Tipos de denuncia</h4>
+
+<p>
+1 - Baches<br>
+2 - Falta de Alumbrado<br>
+3 - Mantenimiento de Alumbrado<br>
+4 - Fuga de agua<br>
+5 - Faltan Semáforos<br>
+6 - Mantenimiento de Semáforos<br>
+7 - Fuga de gas
+</p>
+
+<input type="text" id="tipo" placeholder="Número del tipo de denuncia">
+
+<input type="text" id="nombre" placeholder="Nombre">
+
+<label>
+<input type="checkbox" id="anonima">
+Realizar denuncia anónima
+</label>
+
+<input type="text" id="direccion" placeholder="Dirección">
+
+<input type="text" id="descripcion" placeholder="Descripción">
+
+<br>
+
+<button onclick="guardarDenuncia()">
+Guardar Denuncia
+</button>
+
+</div>
+
+<div class="caja">
+
+<h4>Buscar por nombre</h4>
+
+<input type="text" id="buscarNombre">
+
+<button onclick="buscarNombre()">
+Buscar
+</button>
+
+</div>
+
+<div class="caja">
+
+<h4>Buscar por tipo</h4>
+
+<input type="text" id="buscarTipo">
+
+<button onclick="buscarTipo()">
+Buscar
+</button>
+
+</div>
+
+<div class="caja">
+
+<button onclick="mostrarDenuncias()">
+Mostrar Todas las Denuncias
+</button>
+
+</div>
+
+<textarea id="resultado"></textarea>
+
+</div>
+
+<script>
+
+let nombres = [];
+let direcciones = [];
+let descripciones = [];
+let tipos = [];
+
+function guardarDenuncia(){
+
+    let nombre;
+
+    if(document.getElementById("anonima").checked){
+        nombre = "ANONIMO";
+    }
+    else{
+        nombre =
+        document.getElementById("nombre").value;
+    }
+
+    let tipoNumero =
+    document.getElementById("tipo").value;
+
+    let tipoTexto = "";
+
+    switch(tipoNumero){
+
+        case "1":
+            tipoTexto = "Baches";
+            break;
+
+        case "2":
+            tipoTexto = "Falta de Alumbrado";
+            break;
+
+        case "3":
+            tipoTexto = "Mantenimiento de Alumbrado";
+            break;
+
+        case "4":
+            tipoTexto = "Fuga de agua";
+            break;
+
+        case "5":
+            tipoTexto = "Faltan Semáforos";
+            break;
+
+        case "6":
+            tipoTexto = "Mantenimiento de Semáforos";
+            break;
+
+        case "7":
+            tipoTexto = "Fuga de gas";
+            break;
+
+        default:
+            tipoTexto = "Sin especificar";
+    }
+
+    nombres.push(nombre);
+
+    direcciones.push(
+        document.getElementById("direccion").value
+    );
+
+    descripciones.push(
+        document.getElementById("descripcion").value
+    );
+
+    tipos.push(tipoTexto);
+
+    alert("Denuncia registrada correctamente");
+
+    document.getElementById("nombre").value="";
+    document.getElementById("direccion").value="";
+    document.getElementById("descripcion").value="";
+    document.getElementById("tipo").value="";
+}
+
+function mostrarDenuncias(){
+
+    let texto="";
+
+    if(nombres.length==0){
+
+        texto="No hay denuncias registradas.";
+    }
+
+    for(let i=0;i<nombres.length;i++){
+
+        texto += "Denuncia " + (i+1) + "\n";
+
+        texto += "Nombre: " +
+        nombres[i] + "\n";
+
+        texto += "Dirección: " +
+        direcciones[i] + "\n";
+
+        texto += "Descripción: " +
+        descripciones[i] + "\n";
+
+        texto += "Tipo: " +
+        tipos[i] + "\n\n";
+    }
+
+    document.getElementById("resultado").value =
+    texto;
+}
+
+function buscarNombre(){
+
+    let buscar =
+    document.getElementById("buscarNombre")
+    .value.toUpperCase();
+
+    let texto = "No encontrado";
+
+    for(let i=0;i<nombres.length;i++){
+
+        if(nombres[i].toUpperCase()==buscar){
+
+            texto =
+            "Nombre: " + nombres[i] +
+            "\nDirección: " + direcciones[i] +
+            "\nDescripción: " + descripciones[i] +
+            "\nTipo: " + tipos[i];
+
+            break;
+        }
+    }
+
+    document.getElementById("resultado").value =
+    texto;
+}
+
+function buscarTipo(){
+
+    let buscar =
+    document.getElementById("buscarTipo")
+    .value.toUpperCase();
+
+    let texto = "";
+
+    for(let i=0;i<tipos.length;i++){
+
+        if(tipos[i].toUpperCase()==buscar){
+
+            texto +=
+            "Nombre: " + nombres[i] +
+            "\nDirección: " + direcciones[i] +
+            "\nTipo: " + tipos[i] +
+            "\n\n";
+        }
+    }
+
+    if(texto==""){
+        texto="No encontrada";
+    }
+
+    document.getElementById("resultado").value =
+    texto;
+}
+
+</script>
+
+</body>
+</html>

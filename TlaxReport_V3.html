@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TlaxReport V3</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:20px;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#E6D5F7,#C8A2C8);
+}
+
+.contenedor{
+    max-width:1200px;
+    margin:auto;
+    background:white;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+h1{
+    text-align:center;
+    color:#6A0DAD;
+}
+
+h3{
+    text-align:center;
+    color:#666;
+}
+
+.estadisticas{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:15px;
+    margin-top:20px;
+}
+
+.card{
+    color:white;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+}
+
+.card h2{
+    margin:0;
+    font-size:35px;
+}
+
+.total{
+    background:#6A0DAD;
+}
+
+.baches{
+    background:#E74C3C;
+}
+
+.alumbrado{
+    background:#F39C12;
+}
+
+.agua{
+    background:#3498DB;
+}
+
+.semaforos{
+    background:#27AE60;
+}
+
+.caja{
+    background:#F8F9FA;
+    border-radius:15px;
+    padding:20px;
+    margin-top:20px;
+}
+
+input,
+select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    margin-top:8px;
+    margin-bottom:8px;
+}
+
+button{
+    background:#8E44AD;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#6C3483;
+}
+
+#mapa{
+    height:450px;
+    border-radius:15px;
+    margin-top:15px;
+}
+
+.panelResultados{
+    margin-top:20px;
+}
+
+.denuncia{
+    background:white;
+    border-left:6px solid #8E44AD;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:15px;
+    box-shadow:0 4px 8px rgba(0,0,0,.15);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="contenedor">
+
+<h1>TLAXREPORT V3</h1>
+
+<h3>Sistema Inteligente de Denuncias Ciudadanas</h3>
+
+<div class="estadisticas">
+
+<div class="card total">
+<h2 id="totalDenuncias">0</h2>
+<p>Total</p>
+</div>
+
+<div class="card baches">
+<h2 id="totalBaches">0</h2>
+<p>Baches</p>
+</div>
+
+<div class="card alumbrado">
+<h2 id="totalAlumbrado">0</h2>
+<p>Alumbrado</p>
+</div>
+
+<div class="card agua">
+<h2 id="totalAgua">0</h2>
+<p>Agua</p>
+</div>
+
+<div class="card semaforos">
+<h2 id="totalSemaforos">0</h2>
+<p>Semáforos</p>
+</div>
+
+</div>
+<div class="caja">
+
+<h2>Registrar Denuncia</h2>
+
+<select id="tipo">
+
+<option value="">Seleccione una opción</option>
+
+<option value="Baches">Baches</option>
+<option value="Falta de Alumbrado">Falta de Alumbrado</option>
+<option value="Mantenimiento de Alumbrado">Mantenimiento de Alumbrado</option>
+<option value="Fuga de agua">Fuga de agua</option>
+<option value="Faltan Semáforos">Faltan Semáforos</option>
+<option value="Mantenimiento de Semáforos">Mantenimiento de Semáforos</option>
+<option value="Fuga de gas">Fuga de gas</option>
+
+</select>
+
+<input
+type="text"
+id="nombre"
+placeholder="Nombre">
+
+<label>
+
+<input
+type="checkbox"
+id="anonima">
+
+Realizar denuncia anónima
+
+</label>
+
+<input
+type="text"
+id="direccion"
+placeholder="Dirección">
+
+<input
+type="text"
+id="descripcion"
+placeholder="Descripción">
+
+<button onclick="obtenerUbicacion()">
+Usar mi ubicación actual
+</button>
+
+<button onclick="guardarDenuncia()">
+Guardar Denuncia
+</button>
+
+</div>
+
+<div class="caja">
+
+<h2>Mapa de Ubicación</h2>
+
+<p>
+Haz clic en el mapa para seleccionar
+la ubicación exacta.
+</p>
+
+<div id="mapa"></div>
+
+</div>
+<div class="caja">
+
+<h2>Buscar por Nombre</h2>
+
+<input
+type="text"
+id="buscarNombre">
+
+<button onclick="buscarNombre()">
+Buscar
+</button>
+
+</div>
+
+<div class="caja">
+
+<h2>Buscar por Tipo</h2>
+
+<input
+type="text"
+id="buscarTipo">
+
+<button onclick="buscarTipo()">
+Buscar
+</button>
+
+</div>
+
+<div class="caja">
+
+<button onclick="mostrarDenuncias()">
+Mostrar Todas las Denuncias
+</button>
+
+</div>
+
+<div
+class="panelResultados"
+id="resultado">
+
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+let denuncias =
+JSON.parse(
+localStorage.getItem("denuncias")
+) || [];
+
+let latitud = null;
+let longitud = null;
+
+let marcadorTemporal;
+
+const mapa =
+L.map('mapa')
+.setView(
+[19.3181,-98.2375],
+13
+);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+attribution:'OpenStreetMap'
+}
+).addTo(mapa);
+
+mapa.on('click',function(e){
+
+latitud = e.latlng.lat;
+longitud = e.latlng.lng;
+
+if(marcadorTemporal){
+mapa.removeLayer(marcadorTemporal);
+}
+
+marcadorTemporal =
+L.marker(
+[latitud,longitud]
+).addTo(mapa);
+
+});
+
+function obtenerUbicacion(){
+
+navigator.geolocation.getCurrentPosition(
+
+function(pos){
+
+latitud =
+pos.coords.latitude;
+
+longitud =
+pos.coords.longitude;
+
+mapa.setView(
+[latitud,longitud],
+16
+);
+
+if(marcadorTemporal){
+mapa.removeLayer(
+marcadorTemporal
+);
+}
+
+marcadorTemporal =
+L.marker(
+[latitud,longitud]
+).addTo(mapa);
+
+},
+
+function(){
+
+alert(
+"No fue posible obtener la ubicación."
+);
+
+}
+
+);
+
+}
+function guardarDenuncia(){
+
+let nombre;
+
+if(
+document.getElementById(
+"anonima"
+).checked
+){
+nombre = "ANONIMO";
+}
+else{
+nombre =
+document.getElementById(
+"nombre"
+).value;
+}
+
+let denuncia = {
+
+nombre: nombre,
+
+tipo:
+document.getElementById(
+"tipo"
+).value,
+
+direccion:
+document.getElementById(
+"direccion"
+).value,
+
+descripcion:
+document.getElementById(
+"descripcion"
+).value,
+
+latitud: latitud,
+
+longitud: longitud,
+
+fecha:
+new Date()
+.toLocaleDateString()
+
+};
+
+denuncias.push(
+denuncia
+);
+
+localStorage.setItem(
+"denuncias",
+JSON.stringify(
+denuncias
+)
+);
+
+agregarMarcador(
+denuncia
+);
+
+actualizarDashboard();
+
+alert(
+"Denuncia guardada correctamente"
+);
+
+document.getElementById(
+"nombre"
+).value="";
+
+document.getElementById(
+"direccion"
+).value="";
+
+document.getElementById(
+"descripcion"
+).value="";
+
+document.getElementById(
+"tipo"
+).value="";
+
+}
+
+function agregarMarcador(d){
+
+if(
+d.latitud==null ||
+d.longitud==null
+){
+return;
+}
+
+L.marker(
+[d.latitud,d.longitud]
+)
+
+.addTo(mapa)
+
+.bindPopup(
+
+"<b>"+d.tipo+"</b><br>" +
+
+d.descripcion +
+
+"<br>" +
+
+d.direccion
+
+);
+
+}
+
+function mostrarDenuncias(){
+
+let html = "";
+
+for(
+let i=0;
+i<denuncias.length;
+i++
+){
+
+html +=
+
+'<div class="denuncia">' +
+
+'<h4>'+
+denuncias[i].tipo+
+'</h4>' +
+
+'<p><b>Nombre:</b> '+
+denuncias[i].nombre+
+'</p>' +
+
+'<p><b>Dirección:</b> '+
+denuncias[i].direccion+
+'</p>' +
+
+'<p><b>Descripción:</b> '+
+denuncias[i].descripcion+
+'</p>' +
+
+'<p><b>Fecha:</b> '+
+denuncias[i].fecha+
+'</p>' +
+
+'</div>';
+
+}
+
+if(
+denuncias.length==0
+){
+
+html =
+"<h3>No hay denuncias registradas</h3>";
+
+}
+
+document.getElementById(
+"resultado"
+).innerHTML = html;
+
+}
+
+function buscarNombre(){
+
+let nombreBuscado =
+document
+.getElementById(
+"buscarNombre"
+)
+.value
+.toUpperCase();
+
+let html = "";
+
+for(
+let i=0;
+i<denuncias.length;
+i++
+){
+
+if(
+
+denuncias[i]
+.nombre
+.toUpperCase()
+
+.includes(
+nombreBuscado
+)
+
+){
+
+html +=
+
+'<div class="denuncia">' +
+
+'<h4>'+
+denuncias[i].tipo+
+'</h4>' +
+
+'<p><b>Nombre:</b> '+
+denuncias[i].nombre+
+'</p>' +
+
+'<p><b>Dirección:</b> '+
+denuncias[i].direccion+
+'</p>' +
+
+'<p><b>Descripción:</b> '+
+denuncias[i].descripcion+
+'</p>' +
+
+'</div>';
+
+}
+
+}
+
+if(html==""){
+html =
+"<h3>No encontrado</h3>";
+}
+
+document.getElementById(
+"resultado"
+).innerHTML = html;
+
+}
+
+function buscarTipo(){
+
+let tipoBuscado =
+document
+.getElementById(
+"buscarTipo"
+)
+.value
+.toUpperCase();
+
+let html = "";
+
+for(
+let i=0;
+i<denuncias.length;
+i++
+){
+
+if(
+
+denuncias[i]
+.tipo
+.toUpperCase()
+
+.includes(
+tipoBuscado
+)
+
+){
+
+html +=
+
+'<div class="denuncia">' +
+
+'<h4>'+
+denuncias[i].tipo+
+'</h4>' +
+
+'<p><b>Nombre:</b> '+
+denuncias[i].nombre+
+'</p>' +
+
+'<p><b>Dirección:</b> '+
+denuncias[i].direccion+
+'</p>' +
+
+'<p><b>Descripción:</b> '+
+denuncias[i].descripcion+
+'</p>' +
+
+'</div>';
+
+}
+
+}
+
+if(html==""){
+html =
+"<h3>No encontrado</h3>";
+}
+
+document.getElementById(
+"resultado"
+).innerHTML = html;
+
+}
+
+function actualizarDashboard(){
+
+let baches=0;
+let alumbrado=0;
+let agua=0;
+let semaforos=0;
+
+for(
+let i=0;
+i<denuncias.length;
+i++
+){
+
+if(
+denuncias[i].tipo
+=="Baches"
+){
+baches++;
+}
+
+if(
+denuncias[i].tipo
+.includes(
+"Alumbrado"
+)
+){
+alumbrado++;
+}
+
+if(
+denuncias[i].tipo
+=="Fuga de agua"
+){
+agua++;
+}
+
+if(
+denuncias[i].tipo
+.includes(
+"Semáforos"
+)
+){
+semaforos++;
+}
+
+}
+
+document.getElementById(
+"totalDenuncias"
+).innerHTML =
+denuncias.length;
+
+document.getElementById(
+"totalBaches"
+).innerHTML =
+baches;
+
+document.getElementById(
+"totalAlumbrado"
+).innerHTML =
+alumbrado;
+
+document.getElementById(
+"totalAgua"
+).innerHTML =
+agua;
+
+document.getElementById(
+"totalSemaforos"
+).innerHTML =
+semaforos;
+
+}
+
+for(
+let i=0;
+i<denuncias.length;
+i++
+){
+agregarMarcador(
+denuncias[i]
+);
+}
+
+actualizarDashboard();
+
+mostrarDenuncias();
+
+</script>
+
+</body>
+</html>
